@@ -1,28 +1,37 @@
 import { Injectable } from '@nestjs/common';
 import * as TelegramBot from 'node-telegram-bot-api';
-import { AppService } from 'src/app.service';
+import { AirService } from '../air/air.service';
+import * as cron from 'node-cron';
 
 @Injectable()
 export class TelegramService {
-  constructor(private readonly appService: AppService) {
-    const bot = new TelegramBot(
+  private bot;
+
+  constructor(private readonly airService: AirService) {
+    this.bot = new TelegramBot(
       '6927664692:AAEvHK3pgIY0YXremYyCcPOQz-WRWQPOY64',
       { polling: true },
     );
 
-    bot.setMyCommands([{ command: '/getData', description: 'get data' }]);
+    this.report();
 
-    bot.on('message', async (msg) => {
-      const text = msg.text;
-      const chatId = msg.chat.id;
-
-      if (text === '/getData') {
-        return bot.sendMessage(
-          chatId,
-          JSON.stringify(await this.appService.findCountry()),
-        );
-      }
-      return bot.sendMessage(chatId, 'Я Вас не понимаю');
+    cron.schedule('1 7-23 * * *', async () => {
+      this.report();
     });
+  }
+
+  private async report() {
+    const ownChatId = -1002072527250;
+    const result = await this.airService.findCountry();
+    const index = (result as any).data.current.pollution.aqius;
+    console.log(result);
+    if (index < 100) {
+      this.bot.sendMessage(
+        ownChatId,
+        `Воздух норм, проветри\nИндекс: ${index}`,
+      );
+    } else {
+      this.bot.sendMessage(ownChatId, `Закрывай окна\nИндекс: ${index}`);
+    }
   }
 }

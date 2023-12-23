@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TelegramService } from './telegram.service';
-import { AppService } from 'src/app.service';
-import { HttpService } from '@nestjs/axios';
+import { AirModule } from '../air/air.module';
 
 @Module({
-  providers: [TelegramService, AppService],
+  imports: [AirModule],
+  providers: [TelegramService],
 })
 export class TelegramModule {}
