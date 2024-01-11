@@ -8,10 +8,7 @@ export class TelegramService {
   private bot: TelegramBot;
 
   constructor(private readonly airService: AirService) {
-    this.bot = new TelegramBot(
-      '6927664692:AAEvHK3pgIY0YXremYyCcPOQz-WRWQPOY64',
-      { polling: true },
-    );
+    this.bot = new TelegramBot(process.env.TOKEN, { polling: true });
     this.bot.on('message', async (msg) => {
       const text = msg.text;
       const chatId = msg.chat.id;
