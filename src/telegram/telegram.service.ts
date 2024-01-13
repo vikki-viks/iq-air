@@ -36,9 +36,11 @@ export class TelegramService {
     });
   }
 
-  @Cron('1 7-23 * * *')
+  @Cron('* * * * *')
   private async report(lat, lon) {
     try {
+      console.log(lat, lon);
+
       const ownChatId = -1002072527250;
       const result = await this.airService.findCountry(lat, lon);
       const index = (result as any).data.current.pollution.aqius;
