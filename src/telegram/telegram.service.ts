@@ -36,7 +36,7 @@ export class TelegramService {
     });
   }
 
-  @Cron('* * * * *')
+  @Cron('1 7-23 * * *')
   private async report(lat, lon) {
     try {
       console.log(lat, lon);
