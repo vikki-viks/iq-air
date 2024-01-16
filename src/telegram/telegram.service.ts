@@ -12,7 +12,6 @@ export class TelegramService {
     this.bot.on('message', async (msg) => {
       const text = msg.text;
       const chatId = msg.chat.id;
-      console.log(text);
 
       if (text.startsWith('/sendlocation')) {
         return this.bot.sendMessage(
@@ -44,14 +43,21 @@ export class TelegramService {
       const ownChatId = -1002072527250;
       const result = await this.airService.findCountry(lat, lon);
       const index = (result as any).data.current.pollution.aqius;
+
+      const response = await fetch(process.env.URL);
+      const data = await response.json();
+      const url = data[0].url;
+
       console.log(result);
       if (index < 100) {
         this.bot.sendMessage(
           ownChatId,
           `Воздух норм, проветри\nИндекс: ${index}`,
         );
+        this.bot.sendPhoto(ownChatId, url);
       } else {
         this.bot.sendMessage(ownChatId, `Закрывай окна\nИндекс: ${index}`);
+        this.bot.sendPhoto(ownChatId, url);
       }
     } catch (error) {
       return error;
